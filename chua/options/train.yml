@@ -1,19 +1,19 @@
 name: Track1
 use_tb_logger: true
-suffix: ~  # add suffix to saved images
-model: srgan
+suffix: ~ # add suffix to saved images
+model: srgan #other model names to be given and listed at models/_init_.py create_model()
 distortion: sr
 scale: 4
-crop_border: ~  # crop border when evaluation. If None(~), crop the scale pixels
+crop_border: ~ # crop border when evaluation. If None(~), crop the scale pixels
 gpu_ids: [0, 1]
 
 datasets:
-  train:  # the 1st test dataset
-    name: DIV2K
-    mode: yoon
-    dataroot_GT: /mnt/data/NTIRE2020/realSR/track1/Corrupted-tr-y
-    kernel_folder: yoon/kernels/track1
-    noise_folder: yoon/noises/track1/p128_v100
+  train: # the 1st train dataset
+    name: FYP_TRAIN
+    mode: chua
+    dataroot_GT: chua/data
+    kernel_folder: chua/kernels/train
+    noise_folder: chua/noises/train
 
     use_shuffle: true
     n_workers: 24
@@ -24,10 +24,10 @@ datasets:
     color: RGB
 
   val:
-    name: DIV2K_VAL
-    mode: yoon
-    dataroot_LQ: /mnt/data/NTIRE2020/realSR/track1/Corrupted-va-x
-    dataroot_GT: /mnt/data/NTIRE2020/realSR/track1/DIV2K_valid_HR
+    name: FYP_VAL
+    mode: chua
+    #dataroot_LQ: /mnt/data/NTIRE2020/realSR/track1/Corrupted-va-x
+    #dataroot_GT: /mnt/data/NTIRE2020/realSR/track1/DIV2K_valid_HR
 
     num_val: 20
     use_shuffle: false
@@ -51,8 +51,9 @@ network_D:
 
 #### path
 path:
-  pretrain_model_G: pretrained_model/esrgan/RRDB_ESRGAN_x4.pth
+  pretrain_model_G: pretrained_model/esrgan/RRDB_ESRGAN_x4.pth #probably dont need use
   results_root: ./results/
+  val_images: ./val_image_output
 
 #### training settings: learning rate scheme, loss
 train:
@@ -67,7 +68,7 @@ train:
   lr_scheme: MultiStepLR
 
   niter: 40000
-  warmup_iter: -1  # no warm up
+  warmup_iter: -1 # no warm up
   lr_steps: [4000, 8000, 12000]
   lr_gamma: 0.5
 
@@ -75,7 +76,7 @@ train:
   pixel_weight: !!float 1e-2
   feature_criterion: l1
   feature_weight: 1
-  gan_type: ragan  # gan | ragan
+  gan_type: ragan # gan | ragan
   gan_weight: !!float 5e-3
 
   D_update_ratio: 1
