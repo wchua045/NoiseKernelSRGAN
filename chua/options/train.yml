@@ -12,8 +12,8 @@ datasets:
     name: FYP_TRAIN
     mode: chua
     dataroot_GT: chua/data
-    kernel_folder: chua/kernels/train
-    noise_folder: chua/noises/train
+    kernel_folder: chua/kernels
+    noise_folder: chua/noises
 
     use_shuffle: true
     n_workers: 24
