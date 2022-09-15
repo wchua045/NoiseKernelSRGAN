@@ -297,4 +297,4 @@ if __name__ == '__main__':
     torch.backends.cudnn.benchmark = False
     num_gpus = torch.cuda.device_count()
     torch.multiprocessing.spawn(main, nprocs=num_gpus, args=(num_gpus, ))
-    #main(-1, 2)
+    main(-1, 2)
