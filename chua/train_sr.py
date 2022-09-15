@@ -31,7 +31,7 @@ def init_dist(backend='nccl', rank=0):
         backend=backend, init_method="tcp://127.0.0.1:23571", world_size=num_gpus, rank=rank)
 
 
-def main(gpu, num_gpus):
+def main():
     # options
     parser = argparse.ArgumentParser()
     parser.add_argument('-opt', type=str, help='Path to option YMAL file.')
