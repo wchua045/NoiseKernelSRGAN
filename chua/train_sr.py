@@ -48,9 +48,11 @@ def main(gpu, num_gpus):
         print('Disabled distributed training.')
     else:
         opt['dist'] = True
-        init_dist(rank=gpu)
-        world_size = torch.distributed.get_world_size()
-        rank = torch.distributed.get_rank()
+        # init_dist()
+        #world_size = torch.distributed.get_world_size()
+        #rank = torch.distributed.get_rank()
+        world_size = 1
+        rank = 0
 
     # loading resume state if exists
     if opt['path'].get('resume_state', None):
@@ -118,7 +120,8 @@ def main(gpu, num_gpus):
                 math.ceil(len(train_set) / dataset_opt['batch_size']))
             total_iters = int(opt['train']['niter'])
             total_epochs = int(math.ceil(total_iters / train_size))
-            if opt['dist']:
+            # if opt['dist']:
+            if True:
                 train_sampler = DistIterSampler(
                     train_set, world_size, rank, dataset_ratio)
                 total_epochs = int(
@@ -162,7 +165,8 @@ def main(gpu, num_gpus):
     logger.info('Start training from epoch: {:d}, iter: {:d}'.format(
         start_epoch, current_step))
     for epoch in range(start_epoch, total_epochs + 1):
-        if opt['dist']:
+        # if opt['dist']:
+        if True:
             train_sampler.set_epoch(epoch)
         for ii, train_data in enumerate(train_loader):
             current_step += 1
@@ -293,8 +297,8 @@ def main(gpu, num_gpus):
 
 
 if __name__ == '__main__':
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-    num_gpus = torch.cuda.device_count()
-    torch.multiprocessing.spawn(main, nprocs=num_gpus, args=(num_gpus, ))
-    main(-1, 2)
+    #torch.backends.cudnn.deterministic = True
+    #torch.backends.cudnn.benchmark = False
+    #num_gpus = torch.cuda.device_count()
+    #torch.multiprocessing.spawn(main, nprocs=num_gpus, args=(num_gpus, ))
+    main()
