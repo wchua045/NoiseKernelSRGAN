@@ -35,7 +35,7 @@ def create_dataset(dataset_opt):
         dataset = D(dataset_opt)
     # elif mode == 'LQGTseg_bg':
     #     from data.LQGT_seg_bg_dataset import LQGTSeg_BG_Dataset as D
-    elif mode == 'yoon':
+    elif mode == 'chua':
         if dataset_opt["phase"] == "train":
             from degradation_pair_data import DegradationParing as D
             hr_folder = dataset_opt["dataroot_GT"]
@@ -45,16 +45,19 @@ def create_dataset(dataset_opt):
             scale_factor = 1 / dataset_opt["scale"]
             use_shuffle = dataset_opt["use_shuffle"]
             rgb = dataset_opt["color"] == "RGB"
-            dataset = D(hr_folder, kern_folder, noise_folder, scale_factor, gt_patch_size, permute=use_shuffle, bgr2rgb=rgb)
+            dataset = D(hr_folder, kern_folder, noise_folder, scale_factor,
+                        gt_patch_size, permute=use_shuffle, bgr2rgb=rgb)
         else:
             from degradation_pair_data import TestDataSR as D
             lr_folder = dataset_opt["dataroot_LQ"]
             gt_folder = dataset_opt["dataroot_GT"]
             use_shuffle = dataset_opt["use_shuffle"]
             rgb = dataset_opt["color"] == "RGB"
-            dataset = D(lr_folder, gt_folder, "/mnt/data/NTIRE2020/realSR/track1/Corrupted-te-x", permute=use_shuffle, bgr2rgb=rgb)
+            dataset = D(lr_folder, gt_folder, "/mnt/data/NTIRE2020/realSR/track1/Corrupted-te-x",
+                        permute=use_shuffle, bgr2rgb=rgb)
     else:
-        raise NotImplementedError('Dataset [{:s}] is not recognized.'.format(mode))
+        raise NotImplementedError(
+            'Dataset [{:s}] is not recognized.'.format(mode))
 
     logger = logging.getLogger('base')
     logger.info('Dataset [{:s} - {:s}] is created.'.format(dataset.__class__.__name__,
