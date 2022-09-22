@@ -11,11 +11,13 @@ from models.modules.loss import GANLoss
 
 logger = logging.getLogger('base')
 
+
 class SRGANModel(BaseModel):
     def __init__(self, opt):
         super(SRGANModel, self).__init__(opt)
         if opt['dist']:
-            self.rank = torch.distributed.get_rank()
+            #self.rank = torch.distributed.get_rank()
+            self.rank = 0
         else:
             self.rank = -1  # non dist training
         train_opt = opt['train']
@@ -23,14 +25,16 @@ class SRGANModel(BaseModel):
         # define networks and load pretrained models
         self.netG = networks.define_G(opt).to(self.device)
         if opt['dist']:
-            self.netG = DistributedDataParallel(self.netG, device_ids=[torch.cuda.current_device()])
+            self.netG = DistributedDataParallel(
+                self.netG, device_ids=[torch.cuda.current_device()])
         else:
             self.netG = DataParallel(self.netG)
         if self.is_train:
             self.netD = networks.define_D(opt).to(self.device)
             if opt['dist']:
                 if opt['network_D']['norm_layer'] == 'batchnorm':
-                    self.netD = torch.nn.SyncBatchNorm.convert_sync_batchnorm(self.netD).to(self.device)
+                    self.netD = torch.nn.SyncBatchNorm.convert_sync_batchnorm(
+                        self.netD).to(self.device)
                 self.netD = DistributedDataParallel(self.netD,
                                                     device_ids=[torch.cuda.current_device()])
             else:
@@ -50,7 +54,8 @@ class SRGANModel(BaseModel):
                 elif l_pix_type == 'l2':
                     self.cri_pix = nn.MSELoss().to(self.device)
                 else:
-                    raise NotImplementedError('Loss type [{:s}] not recognized.'.format(l_pix_type))
+                    raise NotImplementedError(
+                        'Loss type [{:s}] not recognized.'.format(l_pix_type))
                 self.l_pix_w = train_opt['pixel_weight']
             else:
                 logger.info('Remove pixel loss.')
@@ -64,13 +69,15 @@ class SRGANModel(BaseModel):
                 elif l_fea_type == 'l2':
                     self.cri_fea = nn.MSELoss().to(self.device)
                 else:
-                    raise NotImplementedError('Loss type [{:s}] not recognized.'.format(l_fea_type))
+                    raise NotImplementedError(
+                        'Loss type [{:s}] not recognized.'.format(l_fea_type))
                 self.l_fea_w = train_opt['feature_weight']
             else:
                 logger.info('Remove feature loss.')
                 self.cri_fea = None
             if self.cri_fea:  # load VGG perceptual loss
-                self.netF = networks.define_F(opt, use_bn=False).to(self.device)
+                self.netF = networks.define_F(
+                    opt, use_bn=False).to(self.device)
                 # if opt['dist']:
                 #     self.netF = DistributedDataParallel(self.netF,
                 #                                         device_ids=[torch.cuda.current_device()])
@@ -78,7 +85,8 @@ class SRGANModel(BaseModel):
                 #     self.netF = DataParallel(self.netF)
 
             # GD gan loss
-            self.cri_gan = GANLoss(train_opt['gan_type'], 1.0, 0.0).to(self.device)
+            self.cri_gan = GANLoss(
+                train_opt['gan_type'], 1.0, 0.0).to(self.device)
             self.l_gan_w = train_opt['gan_weight']
             # D_update_ratio and D_init_iters
             self.D_update_ratio = train_opt['D_update_ratio'] if train_opt['D_update_ratio'] else 1
@@ -93,7 +101,8 @@ class SRGANModel(BaseModel):
                     optim_params.append(v)
                 else:
                     if self.rank <= 0:
-                        logger.warning('Params [{:s}] will not optimize.'.format(k))
+                        logger.warning(
+                            'Params [{:s}] will not optimize.'.format(k))
             self.optimizer_G = torch.optim.Adam(optim_params, lr=train_opt['lr_G'],
                                                 weight_decay=wd_G,
                                                 betas=(train_opt['beta1_G'], train_opt['beta2_G']))
@@ -121,7 +130,8 @@ class SRGANModel(BaseModel):
                             optimizer, train_opt['T_period'], eta_min=train_opt['eta_min'],
                             restarts=train_opt['restarts'], weights=train_opt['restart_weights']))
             else:
-                raise NotImplementedError('MultiStepLR learning rate scheme is enough.')
+                raise NotImplementedError(
+                    'MultiStepLR learning rate scheme is enough.')
 
             self.log_dict = OrderedDict()
 
@@ -174,14 +184,17 @@ class SRGANModel(BaseModel):
         self.optimizer_D.zero_grad()
         l_d_total = 0
         pred_d_real = self.netD(self.var_ref)
-        pred_d_fake = self.netD(self.fake_H.detach())  # detach to avoid BP to G
+        # detach to avoid BP to G
+        pred_d_fake = self.netD(self.fake_H.detach())
         if self.opt['train']['gan_type'] == 'gan':
             l_d_real = self.cri_gan(pred_d_real, True)
             l_d_fake = self.cri_gan(pred_d_fake, False)
             l_d_total = l_d_real + l_d_fake
         elif self.opt['train']['gan_type'] == 'ragan':
-            l_d_real = self.cri_gan(pred_d_real - torch.mean(pred_d_fake), True)
-            l_d_fake = self.cri_gan(pred_d_fake - torch.mean(pred_d_real), False)
+            l_d_real = self.cri_gan(
+                pred_d_real - torch.mean(pred_d_fake), True)
+            l_d_fake = self.cri_gan(
+                pred_d_fake - torch.mean(pred_d_real), False)
             l_d_total = (l_d_real + l_d_fake) / 2
 
         l_d_total.backward()
@@ -209,7 +222,8 @@ class SRGANModel(BaseModel):
 
     def back_projection(self):
         lr_error = self.var_L - torch.nn.functional.interpolate(self.fake_H,
-                                                                scale_factor=1/self.opt['scale'],
+                                                                scale_factor=1 /
+                                                                self.opt['scale'],
                                                                 mode='bicubic',
                                                                 align_corners=False)
         us_error = torch.nn.functional.interpolate(lr_error,
@@ -256,9 +270,11 @@ class SRGANModel(BaseModel):
                 # print(len(x))
                 # print(x[0].size())
                 y = P.data_parallel(self.netG, *x, range(n_GPUs))
-                if not isinstance(y, list): y = [y]
+                if not isinstance(y, list):
+                    y = [y]
                 if not y_chops:
-                    y_chops = [[c for c in _y.chunk(n_GPUs, dim=0)] for _y in y]
+                    y_chops = [[c for c in _y.chunk(
+                        n_GPUs, dim=0)] for _y in y]
                 else:
                     for y_chop, _y in zip(y_chops, y):
                         y_chop.extend(_y.chunk(n_GPUs, dim=0))
@@ -269,11 +285,13 @@ class SRGANModel(BaseModel):
                 # print('len(p)', len(p))
                 # print('p[0].size()', p[0].size())
                 y = self.forward_chop(*p, shave=shave, min_size=min_size)
-                if not isinstance(y, list): y = [y]
+                if not isinstance(y, list):
+                    y = [y]
                 if not y_chops:
                     y_chops = [[_y] for _y in y]
                 else:
-                    for y_chop, _y in zip(y_chops, y): y_chop.append(_y)
+                    for y_chop, _y in zip(y_chops, y):
+                        y_chop.append(_y)
 
         h *= scale
         w *= scale
@@ -318,7 +336,8 @@ class SRGANModel(BaseModel):
         else:
             net_struc_str = '{}'.format(self.netG.__class__.__name__)
         if self.rank <= 0:
-            logger.info('Network G structure: {}, with parameters: {:,d}'.format(net_struc_str, n))
+            logger.info(
+                'Network G structure: {}, with parameters: {:,d}'.format(net_struc_str, n))
             logger.info(s)
         if self.is_train:
             # Discriminator
@@ -351,11 +370,13 @@ class SRGANModel(BaseModel):
         load_path_G = self.opt['path']['pretrain_model_G']
         if load_path_G is not None:
             logger.info('Loading model for G [{:s}] ...'.format(load_path_G))
-            self.load_network(load_path_G, self.netG, self.opt['path']['strict_load'])
+            self.load_network(load_path_G, self.netG,
+                              self.opt['path']['strict_load'])
         load_path_D = self.opt['path']['pretrain_model_D']
         if self.opt['is_train'] and load_path_D is not None:
             logger.info('Loading model for D [{:s}] ...'.format(load_path_D))
-            self.load_network(load_path_D, self.netD, self.opt['path']['strict_load'])
+            self.load_network(load_path_D, self.netD,
+                              self.opt['path']['strict_load'])
 
     def save(self, iter_step):
         self.save_network(self.netG, 'G', iter_step)
