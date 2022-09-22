@@ -8,7 +8,8 @@ def create_dataloader(dataset, dataset_opt, opt=None, sampler=None):
     phase = dataset_opt['phase']
     if phase == 'train':
         if opt['dist']:
-            world_size = torch.distributed.get_world_size()
+            #world_size = torch.distributed.get_world_size()
+            world_size = 1
             num_workers = dataset_opt['n_workers']
             assert dataset_opt['batch_size'] % world_size == 0
             batch_size = dataset_opt['batch_size'] // world_size
