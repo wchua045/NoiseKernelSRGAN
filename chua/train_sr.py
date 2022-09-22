@@ -119,6 +119,7 @@ def main():
             train_size = int(
                 math.ceil(len(train_set) / dataset_opt['batch_size']))
             total_iters = int(opt['train']['niter'])
+            # division by zero
             total_epochs = int(math.ceil(total_iters / train_size))
             # if opt['dist']:
             if True:

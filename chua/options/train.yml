@@ -11,9 +11,9 @@ datasets:
   train: # the 1st train dataset
     name: FYP_TRAIN
     mode: chua
-    dataroot_GT: chua/allpatches
-    kernel_folder: chua/kernels
-    noise_folder: chua/noises
+    dataroot_GT: chua/TrainingSet/allpatches
+    kernel_folder: chua/TrainingSet/kernels
+    noise_folder: chua/TrainingSet/noises
 
     use_shuffle: true
     n_workers: 24
@@ -22,16 +22,18 @@ datasets:
     use_flip: true
     use_rot: false
     color: RGB
-
+  '''
   val:
     name: FYP_VAL
-    mode: chua
-    #dataroot_LQ: /mnt/data/NTIRE2020/realSR/track1/Corrupted-va-x
+    mode: LR
+    dataroot_LQ: chua/ValidationSet #validation set
     #dataroot_GT: /mnt/data/NTIRE2020/realSR/track1/DIV2K_valid_HR
+    dataroot_GT: None
 
     num_val: 20
     use_shuffle: false
     color: RGB
+    '''
 
 #### network structures
 network_G:
@@ -51,7 +53,7 @@ network_D:
 
 #### path
 path:
-  pretrain_model_G: pretrained_model/esrgan/RRDB_ESRGAN_x4.pth #probably dont need use
+  pretrain_model_G: pretrained_model/esrgan/RRDB_ESRGAN_x4.pth #Test phase
   results_root: ./results/
   val_images: ./val_image_output
 
