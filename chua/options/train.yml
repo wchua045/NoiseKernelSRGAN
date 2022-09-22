@@ -22,18 +22,17 @@ datasets:
     use_flip: true
     use_rot: false
     color: RGB
-  '''
-  val:
-    name: FYP_VAL
-    mode: LR
-    dataroot_LQ: chua/ValidationSet #validation set
-    #dataroot_GT: /mnt/data/NTIRE2020/realSR/track1/DIV2K_valid_HR
-    dataroot_GT: None
 
-    num_val: 20
-    use_shuffle: false
-    color: RGB
-    '''
+  #val:
+  #name: FYP_VAL
+  #mode: LR
+  #dataroot_LQ: chua/ValidationSet #validation set
+  #dataroot_GT: /mnt/data/NTIRE2020/realSR/track1/DIV2K_valid_HR
+  #dataroot_GT: None
+
+  #num_val: 20
+  #use_shuffle: false
+  #color: RGB
 
 #### network structures
 network_G:
