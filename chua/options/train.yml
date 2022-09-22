@@ -55,6 +55,7 @@ path:
   pretrain_model_G: pretrained_model/esrgan/RRDB_ESRGAN_x4.pth #Test phase
   results_root: ./results/
   val_images: ./val_image_output
+  models: chua #Training phase -- save model path
 
 #### training settings: learning rate scheme, loss
 train:
