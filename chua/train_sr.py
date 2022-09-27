@@ -69,6 +69,8 @@ def main():
         init_dist()
         world_size = torch.distributed.get_world_size()
         rank = torch.distributed.get_rank()
+        logger.info('RANK AND WORLD SIZE: {:d}, iter: {:d}'.format(
+            rank, world_size))
         #world_size = 1
         #rank = 0
 

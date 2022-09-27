@@ -144,6 +144,7 @@ class SRGANModel(BaseModel):
             self.var_H = data['GT'].to(self.device)  # GT
             input_ref = data['ref'] if 'ref' in data else data['GT']
             self.var_ref = input_ref.to(self.device)
+            logger.info('Feeding data...')
 
     def optimize_parameters(self, step):
         # G
@@ -176,6 +177,7 @@ class SRGANModel(BaseModel):
 
             l_g_total.backward()
             self.optimizer_G.step()
+            logger.info('Optimising G...')
 
         # D
         for p in self.netD.parameters():
@@ -199,6 +201,7 @@ class SRGANModel(BaseModel):
 
         l_d_total.backward()
         self.optimizer_D.step()
+        logger.info('Optimising D...')
 
         # set log
         if step % self.D_update_ratio == 0 and step > self.D_init_iters:
