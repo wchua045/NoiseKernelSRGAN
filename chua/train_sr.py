@@ -41,7 +41,7 @@ def init_dist(backend='nccl', rank=0):
     MASTER_PORT = find_free_port()
     # set up the master's ip address so this child process can coordinate
     os.environ['MASTER_ADDR'] = MASTER_ADDR
-    print(f"{MASTER_ADDR=}")
+    print(f"{MASTER_ADDR}")
     os.environ['MASTER_PORT'] = MASTER_PORT
     print(f"{MASTER_PORT}")
     dist.init_process_group(
