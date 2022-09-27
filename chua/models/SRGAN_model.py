@@ -16,8 +16,8 @@ class SRGANModel(BaseModel):
     def __init__(self, opt):
         super(SRGANModel, self).__init__(opt)
         if opt['dist']:
-            #self.rank = torch.distributed.get_rank()
-            self.rank = 0
+            self.rank = torch.distributed.get_rank()
+            #self.rank = 0
         else:
             self.rank = -1  # non dist training
         train_opt = opt['train']

@@ -11,6 +11,8 @@ import logging
 import torch
 import torch.distributed as dist
 import torch.multiprocessing as mp
+import socket
+from contextlib import closing
 
 from data.data_sampler import DistIterSampler
 import options.options as option
@@ -19,16 +21,32 @@ from data import create_dataloader, create_dataset  # creates LR-HR pair
 from models import create_model
 
 
+def find_free_port():
+    """ https://stackoverflow.com/questions/1365265/on-localhost-how-do-i-pick-a-free-port-number """
+    with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+        s.bind(('', 0))
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        return str(s.getsockname()[1])
+
+
 def init_dist(backend='nccl', rank=0):
-    ''' initialization for distributed training'''
+    ''' initialization for distributed training: https://stackoverflow.com/questions/66498045/how-to-solve-dist-init-process-group-from-hanging-or-deadlocks'''
     # if mp.get_start_method(allow_none=True) is None:
     if mp.get_start_method(allow_none=True) != 'spawn':
         mp.set_start_method('spawn')
     # rank = int(os.environ['RANK'])
     num_gpus = torch.cuda.device_count()
     torch.cuda.set_device(rank % num_gpus)
+    MASTER_ADDR = '127.0.0.1'
+    MASTER_PORT = find_free_port()
+    # set up the master's ip address so this child process can coordinate
+    os.environ['MASTER_ADDR'] = MASTER_ADDR
+    print(f"{MASTER_ADDR=}")
+    os.environ['MASTER_PORT'] = MASTER_PORT
+    print(f"{MASTER_PORT}")
     dist.init_process_group(
-        backend=backend, init_method="tcp://127.0.0.1:23571", world_size=num_gpus, rank=rank)
+        backend=backend, world_size=num_gpus, rank=rank)
+    #dist.init_process_group(backend=backend, init_method="tcp://127.0.0.1:23571", world_size=num_gpus, rank=rank)
 
 
 def main():
@@ -48,11 +66,11 @@ def main():
         print('Disabled distributed training.')
     else:
         opt['dist'] = True
-        # init_dist()
-        #world_size = torch.distributed.get_world_size()
-        #rank = torch.distributed.get_rank()
-        world_size = 1
-        rank = 0
+        init_dist()
+        world_size = torch.distributed.get_world_size()
+        rank = torch.distributed.get_rank()
+        #world_size = 1
+        #rank = 0
 
     # loading resume state if exists
     if opt['path'].get('resume_state', None):
