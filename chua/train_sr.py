@@ -69,8 +69,6 @@ def main():
         init_dist()
         world_size = torch.distributed.get_world_size()
         rank = torch.distributed.get_rank()
-        logger.info('RANK AND WORLD SIZE: {:d}, iter: {:d}'.format(
-            rank, world_size))
         #world_size = 1
         #rank = 0
 
@@ -123,6 +121,8 @@ def main():
         seed = random.randint(1, 10000)
     if rank <= 0:
         logger.info('Random seed: {}'.format(seed))
+        logger.info('RANK AND WORLD SIZE: {:d}, iter: {:d}'.format(
+            rank, world_size))
     util.set_random_seed(seed)
 
     # torch.backends.cudnn.benckmark = True
