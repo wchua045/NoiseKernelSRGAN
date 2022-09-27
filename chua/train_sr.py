@@ -225,6 +225,8 @@ def main():
             #                 tb_logger.add_scalar(k, v, current_step)
             #     if rank <= 0:
             #         logger.info(message)
+            logger.info('Epoch: {:d}, iter: {:d}'.format(
+                epoch, current_step))
 
             # validation
             if current_step % opt['train']['val_freq'] == 0 and rank <= 0 and val_loader is not None:
