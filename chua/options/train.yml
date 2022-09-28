@@ -5,7 +5,7 @@ model: srgan #other model names to be given and listed at models/_init_.py creat
 distortion: sr
 scale: 4
 crop_border: ~ # crop border when evaluation. If None(~), crop the scale pixels
-gpu_ids: [0, 1]
+gpu_ids: [0]
 
 datasets:
   train: # the 1st train dataset
