@@ -30,8 +30,8 @@ network_D:
 
 #### path
 path:
-  pretrain_model_G: pretrained_model/100iter50epochs_G_D_RRDBESRGAN/Track1/models/latest_G.pth #pretrained_model/DPED.pth
-  pretrain_model_D: pretrained_model/100iter50epochs_G_D_RRDBESRGAN/Track1/models/latest_D.pth #not sure
+  pretrain_model_G: pretrained_model/500iter42epochs_G_D_RRDBESRGAN/Track1/models/latest_G.pth #pretrained_model/DPED.pth
+  pretrain_model_D: pretrained_model/500iter42epochs_G_D_RRDBESRGAN/Track1/models/latest_D.pth #not sure
   results_root: ./results/
 
 back_projection: False
