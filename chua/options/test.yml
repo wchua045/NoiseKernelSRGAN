@@ -8,7 +8,7 @@ gpu_ids: [0]
 
 datasets:
   test_1: # the 1st test dataset
-    name: 2021
+    name: test_2021
     mode: LR
     dataroot_LR: chua/TestSet/2021 #/mnt/data/NTIRE2020/realSR/track2/DPEDiphone-crop-te-x
 
