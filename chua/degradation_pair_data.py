@@ -24,7 +24,7 @@ from image_downsampling import imresize
 from scipy.io import loadmat
 
 
-def img_random_crop(img, length, yx=None):
+def img_random_crop(img, length, yx=None):  # crop noise patch(img) to lr_size(length)
     img_size = img.shape  # img is an array
     y_range = img_size[0] - length + 1
     x_range = img_size[1] - length + 1
@@ -67,12 +67,12 @@ class DegradationParing(Dataset):
         yx[0] = int(round(yx[0] / self.scale_factor))
         yx[1] = int(round(yx[1] / self.scale_factor))
         hr, _ = img_random_crop(hr_im, self.hr_size, yx)
-        z_im, _ = img_random_crop(noise, self.lr_size)
+        z_im, _ = img_random_crop(noise, self.lr_size)  # cropped noise patch
 
         if random.random() < 0.5:
-            z_im = cv2.flip(z_im, 0)  # vertical
+            z_im = cv2.flip(z_im, 0)  # vertical flip of noise patch
         if random.random() < 0.5:
-            z_im = cv2.flip(z_im, 1)  # horizontal
+            z_im = cv2.flip(z_im, 1)  # horizontal flip of noise patch
         z_mean = np.mean(z_im.reshape(-1, 3), 0).reshape((1, 1, 3))
         z = z_im.astype(np.float) - z_mean
         lr = np.clip(np.round(lr.astype(np.float) + z),
