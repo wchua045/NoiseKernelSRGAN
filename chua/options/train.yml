@@ -11,7 +11,7 @@ datasets:
   train: # the 1st train dataset
     name: FYP_TRAIN
     mode: chua
-    dataroot_GT: chua/TrainingSet/allpatches
+    dataroot_GT: chua/TrainingSet/allpatches_exp1
     kernel_folder: chua/TrainingSet/kernels
     noise_folder: chua/TrainingSet/noises
 
