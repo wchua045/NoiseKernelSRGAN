@@ -11,7 +11,7 @@ datasets:
   train: # the 1st train dataset
     name: FYP_TRAIN
     mode: chua
-    dataroot_GT: chua/TrainingSet/allpatches_exp1
+    dataroot_GT: chua/TrainingSet/allpatches
     kernel_folder: chua/TrainingSet/kernels
     noise_folder: chua/TrainingSet/noises
 
@@ -69,7 +69,7 @@ train:
   beta2_D: 0.99
   lr_scheme: MultiStepLR
 
-  niter: 100 #numtrainingdata/batchsize #yoon:40000
+  niter: 1000 #numtrainingdata/batchsize #yoon:40000
   warmup_iter: -1 # no warm up
   lr_steps: [4000, 8000, 12000]
   lr_gamma: 0.5
